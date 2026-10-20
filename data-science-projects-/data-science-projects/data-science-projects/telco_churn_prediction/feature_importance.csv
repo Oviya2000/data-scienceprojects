@@ -1,0 +1,46 @@
+feature,value,kind,absolute_value
+cat__Contract_Month-to-month,1.330813740090394,coefficient,1.330813740090394
+cat__Contract_Two year,-1.0428108556288642,coefficient,1.0428108556288642
+num__tenure,-0.5719950765051734,coefficient,0.5719950765051734
+cat__Contract_One year,-0.28407795558521054,coefficient,0.28407795558521054
+cat__InternetService_Fiber optic,0.2610084508492704,coefficient,0.2610084508492704
+cat__PaymentMethod_Electronic check,0.21212320394355164,coefficient,0.21212320394355164
+num__SeniorCitizen,0.2111463202880952,coefficient,0.2111463202880952
+cat__InternetService_DSL,-0.1906010831447118,coefficient,0.1906010831447118
+cat__PaymentMethod_Mailed check,-0.18003133552652056,coefficient,0.18003133552652056
+num__MonthlyCharges,0.16588483928703832,coefficient,0.16588483928703832
+cat__OnlineSecurity_No,0.1636983279151143,coefficient,0.1636983279151143
+cat__TechSupport_No,0.15086138271866903,coefficient,0.15086138271866903
+cat__PaperlessBilling_Yes,0.10996440340973475,coefficient,0.10996440340973475
+cat__PaperlessBilling_No,-0.1060394745334496,coefficient,0.1060394745334496
+num__TotalCharges,-0.09545752464412657,coefficient,0.09545752464412657
+cat__OnlineSecurity_Yes,-0.0932909602105654,coefficient,0.0932909602105654
+cat__OnlineBackup_Yes,0.09106384890410393,coefficient,0.09106384890410393
+cat__Partner_No,0.08146305097704307,coefficient,0.08146305097704307
+cat__TechSupport_Yes,-0.08045401501412217,coefficient,0.08045401501412217
+cat__PaymentMethod_Bank transfer (automatic),-0.0798347428308256,coefficient,0.0798347428308256
+cat__Partner_Yes,-0.07753812210075436,coefficient,0.07753812210075436
+cat__DeviceProtection_No,0.07695783414584799,coefficient,0.07695783414584799
+cat__Dependents_No,0.07630034907887846,coefficient,0.07630034907887846
+cat__Dependents_Yes,-0.07237542020263037,coefficient,0.07237542020263037
+cat__StreamingTV_No,0.07192163519561369,coefficient,0.07192163519561369
+cat__OnlineBackup_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__InternetService_No,-0.06648243882825282,coefficient,0.06648243882825282
+cat__StreamingTV_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__StreamingMovies_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__DeviceProtection_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__OnlineSecurity_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__TechSupport_No internet service,-0.06648243882825282,coefficient,0.06648243882825282
+cat__StreamingMovies_No,0.06386683286347505,coefficient,0.06386683286347505
+cat__PaymentMethod_Credit card (automatic),0.05166780329007822,coefficient,0.05166780329007822
+cat__MultipleLines_No,-0.04647448680353606,coefficient,0.04647448680353606
+cat__MultipleLines_Yes,0.02597828078548279,coefficient,0.02597828078548279
+cat__PhoneService_No,0.024421134894333365,coefficient,0.024421134894333365
+cat__MultipleLines_No phone service,0.024421134894333365,coefficient,0.024421134894333365
+cat__OnlineBackup_No,-0.020656481199545666,coefficient,0.020656481199545666
+cat__PhoneService_Yes,-0.020496206018039108,coefficient,0.020496206018039108
+cat__gender_Male,0.010613308428265354,coefficient,0.010613308428265354
+cat__gender_Female,-0.006688379551986487,coefficient,0.006688379551986487
+cat__DeviceProtection_Yes,-0.006550466441297835,coefficient,0.006550466441297835
+cat__StreamingMovies_Yes,0.00654053484108735,coefficient,0.00654053484108735
+cat__StreamingTV_Yes,-0.001514267491078265,coefficient,0.001514267491078265

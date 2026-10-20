@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>HR Attrition Dashboard</title>
+<script>__CHART_JS__</script>
+<style>
+  :root{
+    --pbi-bg:#f3f2f1; --pbi-panel:#ffffff; --pbi-border:#e1dfdd;
+    --pbi-text:#252423; --pbi-muted:#605e5c; --pbi-accent:#005ea8;
+    --pbi-orange:#f2872f; --pbi-green:#3aa655; --pbi-red:#c8163c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;
+       background:var(--pbi-bg);color:var(--pbi-text);font-size:13px}
+  header{background:#fff;border-bottom:1px solid var(--pbi-border);
+         padding:10px 20px;display:flex;justify-content:space-between;align-items:center}
+  header h1{margin:0;font-size:16px;font-weight:600}
+  header .sub{color:var(--pbi-muted);font-size:12px}
+  .app{display:grid;grid-template-columns:220px minmax(0,1fr);gap:12px;padding:12px}
+  .slicers{background:var(--pbi-panel);border:1px solid var(--pbi-border);
+           border-radius:2px;padding:12px;height:fit-content}
+  .slicers h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;
+              color:var(--pbi-muted);letter-spacing:.5px}
+  .slicer{margin-bottom:14px}
+  .slicer-label{font-size:11px;color:var(--pbi-muted);margin-bottom:4px;font-weight:600}
+  .slicer button{display:block;width:100%;text-align:left;padding:5px 8px;margin:2px 0;
+                 background:#fff;border:1px solid var(--pbi-border);border-radius:2px;
+                 cursor:pointer;font-size:12px;color:var(--pbi-text)}
+  .slicer button.active{background:var(--pbi-accent);color:#fff;border-color:var(--pbi-accent)}
+  .slicer button:hover:not(.active){background:#f3f2f1}
+  .reset{color:var(--pbi-accent);font-size:11px;cursor:pointer;margin-top:4px;display:inline-block}
+  main{min-width:0;display:flex;flex-direction:column;gap:12px}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .kpi{background:var(--pbi-panel);border:1px solid var(--pbi-border);border-radius:2px;
+       padding:12px 14px}
+  .kpi .label{color:var(--pbi-muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .kpi .value{font-size:26px;font-weight:600;margin-top:4px}
+  .kpi .delta{font-size:11px;margin-top:2px}
+  .delta.up{color:var(--pbi-red)}
+  .delta.down{color:var(--pbi-green)}
+  .charts-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .charts-row.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{background:var(--pbi-panel);border:1px solid var(--pbi-border);border-radius:2px;
+        padding:12px}
+  .card h4{margin:0 0 8px;font-size:13px;font-weight:600}
+  .card .chart-wrap{position:relative;height:220px}
+  .card .chart-wrap.tall{height:280px}
+  footer{padding:8px 20px;color:var(--pbi-muted);font-size:11px;text-align:center}
+  .badge{display:inline-block;padding:2px 6px;border-radius:2px;font-size:10px;
+         font-weight:600;margin-left:6px}
+  .badge.filtered{background:#fff4e5;color:var(--pbi-orange);border:1px solid #f2c99b}
+  @media (prefers-color-scheme:dark){
+    :root{--pbi-bg:#1f1f1f;--pbi-panel:#2b2b2b;--pbi-border:#3d3d3d;
+          --pbi-text:#f3f2f1;--pbi-muted:#a19f9d}
+    header{background:#2b2b2b}
+    .slicer button{background:#3d3d3d;color:var(--pbi-text)}
+  }
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr}
+    .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .charts-row,.charts-row.three{grid-template-columns:1fr}
+  }
+  .card,.kpi{min-width:0}.chart-wrap{min-width:0;overflow:hidden}canvas{max-width:100%}
+  header{gap:12px;flex-wrap:wrap}.reset{border:1px solid var(--pbi-border);background:var(--pbi-panel);padding:9px;min-height:44px}
+  button:focus-visible,summary:focus-visible{outline:3px solid #118dff;outline-offset:2px}
+  .slicer button{min-height:44px}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--pbi-border)}
+  #selection-status{margin:0;color:var(--pbi-muted)}
+  @media(max-width:480px){.kpi-row{grid-template-columns:1fr}.app{padding:8px}header{padding:14px}header h1{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Human Resources — Attrition Dashboard</h1>
+    <div class="sub">Synthetic HR snapshot · educational analysis, not real employee outcomes</div>
+  </div>
+  <div class="sub">Oviya Elangovan · Power BI-style HTML replica</div>
+</header>
+
+<div class="app">
+  <aside class="slicers">
+    <h3>Filters</h3>
+
+    <div class="slicer">
+      <div class="slicer-label">Department</div>
+      <div id="slicer-dept"></div>
+    </div>
+    <div class="slicer">
+      <div class="slicer-label">Overtime</div>
+      <div id="slicer-ot"></div>
+    </div>
+    <div class="slicer">
+      <div class="slicer-label">Gender</div>
+      <div id="slicer-gender"></div>
+    </div>
+    <div class="slicer">
+      <div class="slicer-label">Business Travel</div>
+      <div id="slicer-travel"></div>
+    </div>
+    <button type="button" class="reset" id="reset">Reset filters</button>
+    <button type="button" class="reset" id="download">Download filtered CSV</button>
+  </aside>
+
+  <main>
+    <p id="selection-status" role="status" aria-live="polite"></p>
+    <div class="kpi-row" id="kpis"></div>
+
+    <div class="charts-row">
+      <div class="card"><h4>Attrition by Department</h4>
+        <div class="chart-wrap"><canvas id="c-dept" role="img" aria-label="Synthetic attrition chart: c-dept"></canvas></div></div>
+      <div class="card"><h4>Attrition Rate by Job Role</h4>
+        <div class="chart-wrap"><canvas id="c-role" role="img" aria-label="Synthetic attrition chart: c-role"></canvas></div></div>
+    </div>
+
+    <div class="charts-row three">
+      <div class="card"><h4>Age Band</h4>
+        <div class="chart-wrap"><canvas id="c-age" role="img" aria-label="Synthetic attrition chart: c-age"></canvas></div></div>
+      <div class="card"><h4>Tenure Band</h4>
+        <div class="chart-wrap"><canvas id="c-ten" role="img" aria-label="Synthetic attrition chart: c-ten"></canvas></div></div>
+      <div class="card"><h4>Income Band</h4>
+        <div class="chart-wrap"><canvas id="c-inc" role="img" aria-label="Synthetic attrition chart: c-inc"></canvas></div></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card"><h4>Overtime effect on attrition</h4>
+        <div class="chart-wrap"><canvas id="c-ot" role="img" aria-label="Synthetic attrition chart: c-ot"></canvas></div></div>
+      <div class="card"><h4>Business travel effect on attrition</h4>
+        <div class="chart-wrap"><canvas id="c-tr" role="img" aria-label="Synthetic attrition chart: c-tr"></canvas></div></div>
+    </div>
+    <details class="card"><summary>View department counts and rates</summary><div class="table-scroll"><table><thead><tr><th>Department</th><th>Employees</th><th>Leavers</th><th>Attrition rate</th></tr></thead><tbody id="summary-rows"></tbody></table></div></details>
+  </main>
+</div>
+
+<footer>
+  Data: synthesised HR dataset (1,470 rows) mirroring the IBM HR Analytics benchmark.
+  Charts by Chart.js. Full DAX model documented in <code>dax_measures.md</code>.
+</footer>
+
+<script>
+// -------------------------- embedded dataset ----------------------------
+const DATA = __HR_DATA__;
+
+Chart.defaults.animation=false;
+Chart.defaults.color=matchMedia('(prefers-color-scheme:dark)').matches?'#d2d0ce':'#605e5c';
+// -------------------------- state --------------------------------------
+const state = { Department:null, OverTime:null, Gender:null, BusinessTravel:null };
+
+function filtered(){
+  return DATA.filter(r =>
+    (!state.Department  || r.Department  === state.Department) &&
+    (!state.OverTime    || r.OverTime    === state.OverTime) &&
+    (!state.Gender      || r.Gender      === state.Gender) &&
+    (!state.BusinessTravel || r.BusinessTravel === state.BusinessTravel)
+  );
+}
+function activeFilters(){
+  return Object.entries(state).filter(([_,v])=>v).map(([k,v])=>`${k}=${v}`);
+}
+
+// -------------------------- slicers ------------------------------------
+function makeSlicer(field, mount){
+  const values = [...new Set(DATA.map(r=>r[field]))].sort();
+  const div = document.getElementById(mount); div.innerHTML='';
+  values.forEach(v=>{
+    const b=document.createElement('button'); b.textContent=v;
+    b.onclick=()=>{state[field] = state[field]===v ? null : v; render();};
+    b.dataset.value=v; div.appendChild(b);
+  });
+}
+function paintSlicers(){
+  document.querySelectorAll('.slicer button').forEach(b=>{
+    const f = b.parentElement.previousElementSibling.textContent;
+    const map = {'Department':'Department','Overtime':'OverTime',
+                 'Gender':'Gender','Business Travel':'BusinessTravel'};
+    const field = map[f];
+    b.classList.toggle('active', state[field]===b.dataset.value);
+    b.setAttribute('aria-pressed',String(state[field]===b.dataset.value));
+  });
+}
+
+// -------------------------- KPIs ---------------------------------------
+function renderKpis(){
+  const rows = filtered();
+  const n = rows.length;
+  const leavers = rows.filter(r=>r.Attrition==='Yes').length;
+  const rate = n ? leavers/n : 0;
+  const income = n ? rows.reduce((s,r)=>s+r.MonthlyIncome,0)/n : 0;
+  const tenure = n ? rows.reduce((s,r)=>s+r.YearsAtCompany,0)/n : 0;
+  const baseRate = DATA.filter(r=>r.Attrition==='Yes').length / DATA.length;
+  const delta = rate - baseRate;
+  const deltaSign = delta>=0?'+':'';
+  const cls = delta>=0?'up':'down';
+  const badge = activeFilters().length
+      ? `<span class="badge filtered">Filtered</span>` : '';
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="label">Employees ${badge}</div>
+      <div class="value">${n.toLocaleString()}</div></div>
+    <div class="kpi"><div class="label">Leavers</div>
+      <div class="value">${leavers.toLocaleString()}</div></div>
+    <div class="kpi"><div class="label">Attrition Rate</div>
+      <div class="value">${n ? (rate*100).toFixed(1)+"%" : "N/A"}</div>
+      <div class="delta ${cls}">${n ? deltaSign+(delta*100).toFixed(1)+" pp vs company" : "No matching employees"}</div></div>
+    <div class="kpi"><div class="label">Avg Monthly Income</div>
+      <div class="value">${n ? "$"+Math.round(income).toLocaleString() : "N/A"}</div></div>
+    <div class="kpi"><div class="label">Avg Tenure</div>
+      <div class="value">${n ? tenure.toFixed(1)+" yrs" : "N/A"}</div></div>`;
+}
+
+// -------------------------- chart helpers ------------------------------
+const charts = {};
+function upsertChart(id, config){
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id).getContext('2d'), config);
+}
+function groupRate(field){
+  const rows = filtered();
+  const g = {};
+  rows.forEach(r=>{
+    g[r[field]] = g[r[field]] || {tot:0, leav:0};
+    g[r[field]].tot++; if(r.Attrition==='Yes') g[r[field]].leav++;
+  });
+  const labels = Object.keys(g).sort();
+  return {
+    labels,
+    rate: labels.map(l => g[l].tot ? g[l].leav/g[l].tot : 0),
+    tot:  labels.map(l => g[l].tot),
+    leav: labels.map(l => g[l].leav),
+  };
+}
+function bandRate(field, bands, labelFn){
+  const rows = filtered();
+  const buckets = bands.map(b=>({label:b.label, tot:0, leav:0}));
+  rows.forEach(r=>{
+    const v = r[field];
+    for(let i=0;i<bands.length;i++){
+      if (v >= bands[i].lo && v <= bands[i].hi){
+        buckets[i].tot++; if(r.Attrition==='Yes') buckets[i].leav++; break;
+      }
+    }
+  });
+  return {
+    labels: buckets.map(b=>b.label),
+    rate:   buckets.map(b=>b.tot?b.leav/b.tot:0),
+    tot:    buckets.map(b=>b.tot),
+    leav:   buckets.map(b=>b.leav),
+  };
+}
+const PBI = { blue:'#118dff', orange:'#f2872f', green:'#3aa655',
+              red:'#c8163c', teal:'#00b7c3', purple:'#8661c5' };
+
+// -------------------------- individual charts --------------------------
+function renderCharts(){
+  // Department — stacked bar of stayers vs leavers
+  const dep = groupRate('Department');
+  upsertChart('c-dept', {
+    type:'bar',
+    data:{ labels: dep.labels,
+      datasets:[
+        {label:'Stayers', data: dep.tot.map((t,i)=>t-dep.leav[i]),
+         backgroundColor: PBI.blue, stack:'s'},
+        {label:'Leavers', data: dep.leav,
+         backgroundColor: PBI.orange, stack:'s'},
+      ]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},
+             scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}
+  });
+
+  // Job role — bar of attrition rate, sorted desc
+  const role = groupRate('JobRole');
+  const roleIdx = role.rate.map((v,i)=>i).sort((a,b)=>role.rate[b]-role.rate[a]);
+  upsertChart('c-role', {
+    type:'bar',
+    data:{ labels: roleIdx.map(i=>role.labels[i]),
+      datasets:[{data: roleIdx.map(i=>(role.rate[i]*100).toFixed(1)),
+                 backgroundColor: PBI.orange}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>`${ctx.parsed.x}% attrition`}}},
+      scales:{x:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  // Age band
+  const age = bandRate('Age',[
+    {label:'20-29',lo:20,hi:29},{label:'30-39',lo:30,hi:39},
+    {label:'40-49',lo:40,hi:49},{label:'50+',lo:50,hi:99},
+  ]);
+  upsertChart('c-age',{
+    type:'bar',
+    data:{labels:age.labels,datasets:[
+      {label:'Attrition %', data:age.rate.map(v=>(v*100).toFixed(1)),
+       backgroundColor: PBI.blue}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% (${age.leav[ctx.dataIndex]} of ${age.tot[ctx.dataIndex]})`}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  // Tenure band
+  const ten = bandRate('YearsAtCompany',[
+    {label:'0-2',lo:0,hi:2},{label:'3-5',lo:3,hi:5},
+    {label:'6-10',lo:6,hi:10},{label:'11+',lo:11,hi:99},
+  ]);
+  upsertChart('c-ten',{
+    type:'bar',
+    data:{labels:ten.labels,datasets:[
+      {label:'Attrition %', data:ten.rate.map(v=>(v*100).toFixed(1)),
+       backgroundColor: PBI.green}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% (${ten.leav[ctx.dataIndex]} of ${ten.tot[ctx.dataIndex]})`}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  // Income band
+  const inc = bandRate('MonthlyIncome',[
+    {label:'<3k',lo:0,hi:2999},{label:'3k–<5k',lo:3000,hi:4999},
+    {label:'5k–<8k',lo:5000,hi:7999},{label:'8k–<12k',lo:8000,hi:11999},
+    {label:'12k+',lo:12000,hi:99999},
+  ]);
+  upsertChart('c-inc',{
+    type:'bar',
+    data:{labels:inc.labels,datasets:[
+      {label:'Attrition %', data:inc.rate.map(v=>(v*100).toFixed(1)),
+       backgroundColor: PBI.red}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% (${inc.leav[ctx.dataIndex]} of ${inc.tot[ctx.dataIndex]})`}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  // Overtime
+  const ot = groupRate('OverTime');
+  upsertChart('c-ot',{
+    type:'bar',
+    data:{labels: ot.labels, datasets:[
+      {label:'Attrition %', data: ot.rate.map(v=>(v*100).toFixed(1)),
+       backgroundColor: [PBI.blue, PBI.red]}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% (${ot.leav[ctx.dataIndex]} of ${ot.tot[ctx.dataIndex]})`}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  // Travel
+  const tr = groupRate('BusinessTravel');
+  upsertChart('c-tr',{
+    type:'bar',
+    data:{labels: tr.labels, datasets:[
+      {label:'Attrition %', data: tr.rate.map(v=>(v*100).toFixed(1)),
+       backgroundColor: PBI.teal}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}% (${tr.leav[ctx.dataIndex]} of ${tr.tot[ctx.dataIndex]})`}}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'%'}}}}
+  });
+}
+
+function render(){
+  paintSlicers(); renderKpis(); renderCharts();
+  document.getElementById('selection-status').textContent=filtered().length+' matching employees · synthetic snapshot · rates describe associations';
+  const dep=groupRate('Department'),body=document.getElementById('summary-rows');body.replaceChildren();
+  dep.labels.forEach((name,i)=>{const tr=document.createElement('tr');[name,dep.tot[i],dep.leav[i],(dep.rate[i]*100).toFixed(1)+'%'].forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td)});body.append(tr)});
+}
+
+document.getElementById('download').onclick=()=>{
+  const rows=filtered(),keys=Object.keys(DATA[0]);
+  const quote=v=>'"'+String(v).replaceAll('"','""')+'"';
+  const csv=[keys.map(quote).join(','),...rows.map(row=>keys.map(key=>quote(row[key])).join(','))].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='hr-filtered-synthetic.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+// -------------------------- boot ---------------------------------------
+makeSlicer('Department','slicer-dept');
+makeSlicer('OverTime','slicer-ot');
+makeSlicer('Gender','slicer-gender');
+makeSlicer('BusinessTravel','slicer-travel');
+document.getElementById('reset').onclick = ()=>{
+  Object.keys(state).forEach(k=>state[k]=null); render();
+};
+render();
+</script>
+</body>
+</html>

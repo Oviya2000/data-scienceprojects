@@ -1,0 +1,4 @@
+BusinessTravel,headcount,leavers,attrition_rate,avg_income
+Non-Travel,174.0,26.0,0.1494,8780.0
+Travel_Frequently,270.0,45.0,0.1667,9024.0
+Travel_Rarely,1026.0,153.0,0.1491,8578.0

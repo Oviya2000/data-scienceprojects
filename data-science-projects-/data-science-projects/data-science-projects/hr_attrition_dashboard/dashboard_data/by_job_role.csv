@@ -1,0 +1,9 @@
+JobRole,headcount,leavers,attrition_rate,avg_income
+Laboratory Technician,208.0,38.0,0.1827,8697.0
+Research Director,200.0,33.0,0.165,8662.0
+Research Scientist,190.0,29.0,0.1526,8807.0
+Manager,381.0,58.0,0.1522,8623.0
+Sales Executive,149.0,22.0,0.1477,8708.0
+Sales Representative,129.0,19.0,0.1473,8754.0
+Healthcare Representative,185.0,22.0,0.1189,8669.0
+Human Resources,28.0,3.0,0.1071,8372.0
